@@ -4,8 +4,8 @@ require __DIR__ . '/vendor/autoload.php';
 
 define("HEADER", [
     "name" => "Название",
-    "address" => "Адрес",
     "phone" => "Телефон",
+    "address" => "Адрес",
 ]);
 
 function checkHeader(array $sheetRow, int $col): ?array {
@@ -75,6 +75,18 @@ $input = $argv[1];
 $reader = new PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 $document = $reader->load($input);
 
-var_dump(getData($document));
+$data = getData($document);
+
+foreach (HEADER as $key => $value) {
+    echo $value, "\t";
+}
+echo "\n";
+
+foreach($data as $dataRow) {
+    foreach (HEADER as $key => $value) {
+        echo $dataRow[$key], "\t";
+    }
+    echo "\n";
+}
 
 ?>
