@@ -50,7 +50,7 @@ function parseSheet(array $sheet): array {
             }
 
             if (in_array(null, $newRow, true)) {
-                continue;
+                break;
             } else {
                 $result[] = $newRow;
             }
