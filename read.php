@@ -8,8 +8,6 @@ define("HEADER", [
     "phone" => "Телефон",
 ]);
 
-// Return array with indexes of coresponding columns if valid hearer is found
-// Return null otherwise
 function checkHeader(array $sheetRow, int $col): ?array {
     $result = array_fill_keys(array_keys(HEADER), null);
 
@@ -21,15 +19,15 @@ function checkHeader(array $sheetRow, int $col): ?array {
         }
     }
 
-    foreach ($result as $value) {
-        if ($value === null) {
-            return null;
-        }
+    if (in_array(null, $result, true)) {
+        return null;
+    } else {
+        return $result;
     }
-
-    return $result;
 };
 
+// Return array with indexes of coresponding columns if valid hearer is found
+// Return null otherwise
 function findHeader(array $sheet): ?array {
     for ($i = 0; $i < (count($sheet) - 1); $i++) {
         for ($j = 0; $j < (count($sheet[$i]) - count(HEADER) + 1); $j++) {
@@ -43,8 +41,23 @@ function findHeader(array $sheet): ?array {
 }
 
 function parseSheet(array $sheet): array {
-    $result = findHeader($sheet);
-    return $result ? $result : [];
+    $result = [];
+    if ($header = findHeader($sheet)) {
+        for ($i = $header["row"] + 1; $i < count($sheet); $i++) {
+            $newRow = [];
+            foreach(HEADER as $key => $value) {
+                $newRow[$key] = $sheet[$i][$header[$key]];
+            }
+
+            if (in_array(null, $newRow, true)) {
+                continue;
+            } else {
+                $result[] = $newRow;
+            }
+        }
+    }
+    
+    return $result;
 };
 
 function getData(PhpOffice\PhpSpreadsheet\Spreadsheet $document): array {
@@ -52,7 +65,7 @@ function getData(PhpOffice\PhpSpreadsheet\Spreadsheet $document): array {
 
     for ($i = 0; $i < $document->getSheetCount(); $i++){
         $sheet = $document->getSheet($i)->toArray();
-        $data[] = parseSheet($sheet);
+        $data = array_merge($data, parseSheet($sheet));
     }
     
     return $data;
