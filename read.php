@@ -2,12 +2,27 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+$header = [
+    "name" => "Название",
+    "address" => "Адрес",
+    "phone" => "Телефон",
+];
+
+function getData(PhpOffice\PhpSpreadsheet\Spreadsheet $document): array {
+    $data = [];
+
+    for ($i = 0; $i < $document->getSheetCount(); $i++){
+        $sheet = $document->getSheet($i)->toArray();
+        $data = array_merge($data, $sheet);
+    }
+    
+    return $data;
+}
+
 $input = $argv[1];
 $reader = new PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-$spreadsheet = $reader->load($input);
+$document = $reader->load($input);
 
-for ($i = 0; $i < $spreadsheet->getSheetCount(); $i++){
-    $data = $spreadsheet->getSheet($i)->toArray();
-    var_dump($data);
-}
+var_dump(getData($document));
+
 ?>
